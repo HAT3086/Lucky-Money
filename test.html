@@ -378,35 +378,6 @@
     // --- 4. GAME FLOW ---
     window.handleYes = function() {
         tryPlayMusic();
-        document.getElementById('ai-text').innerHTML = "Tuyệt vời!<br>Bước 1: Hãy nhập tên của bạn vào bên dưới (nhập đúng tên mới được quà nha // Using "window" to make variables global for HTML buttons
-    window.state = {
-        userName: "", picksLeft: 3, totalMoney: 0,
-        shuffledPrizes: [], musicPlaying: false
-    };
-
-    // --- 3. AUDIO ---
-    const audio = document.getElementById('bg-music');
-    const musicBtn = document.getElementById('music-control');
-
-    window.toggleMusic = function() {
-        if(audio.paused) {
-            audio.play(); musicBtn.innerText = "🔊"; window.state.musicPlaying = true;
-        } else {
-            audio.pause(); musicBtn.innerText = "🔇"; window.state.musicPlaying = false;
-        }
-    }
-
-    function tryPlayMusic() {
-        if(!window.state.musicPlaying) {
-            audio.play().then(() => {
-                musicBtn.innerText = "🔊"; window.state.musicPlaying = true;
-            }).catch(e => console.log("Auto-play blocked"));
-        }
-    }
-
-    // --- 4. GAME FLOW ---
-    window.handleYes = function() {
-        tryPlayMusic();
         document.getElementById('ai-text').innerHTML = "Tuyệt vời!<br>Bước 1: Hãy nhập tên của bạn vào bên dưới (nhập đúng tên mới được quà nha 😊).";
         document.getElementById('choice-btns').style.display = 'none';
         document.getElementById('name-entry-area').style.display = 'flex';
@@ -513,6 +484,4 @@
 </script>
 
 </body>
-
 </html>
-

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lì Xì Tết 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --chat-bg: #1e1e1e;
+            --text-color: #ececec;
+            --lixi-red: #d90429;
+            --lixi-gold: #f4d35e;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 800px; /* INCREASED WIDTH */
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* --- MUSIC CONTROL --- */
+        #music-control {
+            position: absolute;
+            top: 20px; right: 20px; z-index: 200;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--lixi-gold);
+            color: var(--lixi-gold);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 1.2rem;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- PHASE 1: CHAT --- */
+        #chat-interface {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--bg-dark);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+        }
+
+        .ai-avatar {
+            font-size: 4rem; margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .chat-bubble {
+            background: var(--chat-bg);
+            padding: 20px; border-radius: 20px;
+            border: 1px solid #333;
+            max-width: 90%; margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 1.1rem; line-height: 1.6;
+        }
+
+        .btn-group { display: flex; gap: 15px; width: 100%; justify-content: center; }
+        .btn {
+            padding: 12px 30px; border-radius: 50px; border: none;
+            font-weight: 700; font-size: 1rem; cursor: pointer;
+            transition: transform 0.2s; font-family: 'Montserrat', sans-serif;
+        }
+        .btn-yes { background-color: var(--lixi-gold); color: #d90429; }
+        .btn-no { background-color: #444; color: white; }
+        .btn:active { transform: scale(0.95); }
+
+        #name-entry-area {
+            display: none; flex-direction: column; gap: 15px;
+            width: 100%; max-width: 300px; animation: fadeIn 0.5s;
+        }
+
+        input[type="text"] {
+            padding: 15px; border-radius: 10px; border: 1px solid #555;
+            background: #222; color: white; font-size: 1rem;
+            text-align: center; outline: none; font-family: 'Montserrat', sans-serif;
+        }
+
+        /* --- PHASE 2: GAME INTERFACE --- */
+        #game-interface {
+            display: none;
+            min-height: 100vh;
+            text-align: center;
+            box-sizing: border-box;
+            /* 👇 YOUR BACKGROUND IMAGE URL HERE 👇 */
+            background-image: url('bg.jpg'); 
+            background-size: cover; background-position: center;
+            background-color: #580000;
+        }
+
+        .game-overlay {
+            background: rgba(0,0,0,0.6); 
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            padding-bottom: 50px;
+        }
+
+        .game-header h2 {
+            color: var(--lixi-gold);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            font-weight: 800;
+            margin-top: 50px; margin-bottom: 10px;
+        }
+
+        .status-bar {
+            background: rgba(255, 255, 255, 0.95);
+            color: #d90429;
+            padding: 8px 20px; border-radius: 50px;
+            display: inline-block; margin-bottom: 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* --- WIDE GRID SYSTEM --- */
+        .envelope-grid {
+            display: grid;
+            /* Mobile: 2 columns, Desktop: 5 columns */
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+            padding: 20px;
+            width: 90%; /* Use 90% of screen width */
+            margin: 0 auto;
+        }
+        
+        @media (min-width: 600px) {
+            .envelope-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+
+        .envelope-wrapper {
+            aspect-ratio: 3/4;
+            perspective: 1000px;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* 1. IDLE SHAKE (Waiting to be picked) */
+        .envelope-wrapper:not(.opened) {
+            animation: idle-shake 3s ease-in-out infinite;
+        }
+        /* Delay animations so they don't all shake at once */
+        .envelope-wrapper:nth-child(even) { animation-delay: 1.5s; }
+
+        .envelope-wrapper.opened { z-index: 20; }
+
+        .envelope-inner {
+            position: relative; width: 100%; height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        
+        .envelope-wrapper.opened .envelope-inner { transform: rotateY(180deg); }
+        
+        .envelope-front, .envelope-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+        }
+        
+        .envelope-front {
+            background: linear-gradient(135deg, #d90429, #8d0018);
+            border: 2px solid var(--lixi-gold);
+            font-size: 3rem;
+        }
+        
+        .envelope-back {
+            background: transparent; /* Transparent so we just see money */
+            transform: rotateY(180deg);
+        }
+        
+        /* --- REAL MONEY POP OUT --- */
+        .money-img {
+            width: 90%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            opacity: 0; /* Hidden initially */
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+            transition-delay: 0.2s; /* Wait for flip to start */
+        }
+
+        /* When Opened: Slide Up and Fade In */
+        .envelope-wrapper.opened .money-img {
+            opacity: 1;
+            transform: translateY(-40px) scale(1.1); /* POP OUT EFFECT */
+        }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 100;
+            justify-content: center; align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-box {
+            background: white; color: #333;
+            width: 85%; max-width: 350px;
+            padding: 25px; border-radius: 15px;
+            position: relative; text-align: center;
+            box-shadow: 0 0 25px rgba(244, 211, 94, 0.5);
+        }
+
+        .close-btn {
+            position: absolute; top: 10px; right: 15px;
+            font-size: 1.5rem; color: #999; cursor: pointer; font-weight: bold;
+        }
+
+        .result-image {
+            width: 100%; height: auto; border-radius: 10px;
+            margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        
+        /* THE SHAKE EFFECT */
+        @keyframes idle-shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(2deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(-2deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bg-music" loop>
+    <source src="domixi.mp3" type="audio/mpeg">
+</audio>
+
+<div id="app-container">
+    
+    <div id="music-control" onclick="toggleMusic()">🔇</div>
+
+    <div id="chat-interface">
+        <div class="ai-avatar">🤖</div>
+        <div class="chat-bubble" id="ai-text">
+            Xin chào, tôi là AI siuuuuuuuuuu Việt.<br><br>
+            Tin hay không tôi đếch quan tâm, nhưng tôi có thể đoán tên của bạn chỉ với 1 bước.<br><br>
+            Bạn muốn thử không? (thử bấm vào không xem 🤫)
+        </div>
+
+        <div class="btn-group" id="choice-btns">
+            <button class="btn btn-yes" onclick="handleYes()">CÓ CHỨ</button>
+            <button class="btn btn-no" id="btn-no" onclick="handleNo()">không</button>
+        </div>
+
+        <div id="name-entry-area">
+            <input type="text" id="nameInput" placeholder="Nhập tên của bạn vào đây..." autocomplete="off">
+            <button class="btn btn-yes" style="width:100%" onclick="submitName()">XÁC NHẬN</button>
+        </div>
+    </div>
+
+    <div id="game-interface">
+        <div class="game-overlay">
+            <div class="game-header">
+                <h2>🧧 AI LÀ THẦN TÀY</h2>
+                <div class="status-bar">
+                    Lượt bốc: <span id="picks-left">3</span> | Tổng: <span id="current-total">0</span>
+                </div>
+            </div>
+            <div class="envelope-grid" id="grid"></div>
+        </div>
+    </div>
+
+</div>
+
+<div id="rules-modal" class="modal-overlay">
+    <div class="modal-box">
+        <span class="close-btn" onclick="startGame()">×</span>
+        <h2 style="color:var(--lixi-red)">AI LÀ THẦN TÀY?</h2>
+        <p>Alo <strong><span class="player-name"></span></strong> à <strong><span class="player-name"></span></strong> !</p>
+        <div style="text-align: left; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6;">
+            <ul>
+                <li>🧧 Bạn có <strong>10 bao lì xì đè tem loại 2.</strong></li>
+                <li>👆 Bạn được chọn <strong>3 bao</strong> bất kỳ.</li>
+                <li>💰 Giải thưởng từ <strong>30k</strong> đến <strong>200k</strong>.</li>
+            </ul>
+        </div>
+        <p style="font-size: 0.8rem; color: #666;">(Nhấn vào dấu × để bắt đầu)</p>
+    </div>
+</div>
+
+<div id="result-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h2 style="color:var(--lixi-red)">🎉 KẾT QUẢ 🎉</h2>
+        <img src="result.jpg" alt="Result" class="result-image">
+        <p style="margin: 5px 0;">Người nhận: <strong id="ticket-name">...</strong></p>
+        <p style="font-size: 0.8rem; color:#666; margin-top:0;">Thời gian: <span id="ticket-time">...</span></p>
+        <div style="font-size: 2.5rem; color: #d90429; font-weight: 800; margin: 15px 0;" id="ticket-total">0đ</div>
+        <p style="font-size: 0.8rem; color:#666; margin-top:0;">Tải lại trang để chơi lại hoặc đóng trang để thoát 😽</p>
+    </div>
+</div>
+
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyDRiJlbZLGrbZQ-vMV65Cow_e8No-9YCg0",
+        authDomain: "luckymoney-fdd4b.firebaseapp.com",
+        projectId: "luckymoney-fdd4b",
+        storageBucket: "luckymoney-fdd4b.firebasestorage.app",
+        messagingSenderId: "286269081249",
+        appId: "1:286269081249:web:eb5d026bacde7364ed92e0",
+        measurementId: "G-S53VEPH4Z7"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    // --- 2. GAME VARIABLES ---
+    const PRIZE_POOL = [
+        100000, 
+        50000, 50000, 
+        20000, 20000, 20000, 
+        10000, 10000, 10000, 10000
+    ];
+    
+    // Using "window" to make variables global for HTML buttons
+    window.state = {
+        userName: "", picksLeft: 3, totalMoney: 0,
+        shuffledPrizes: [], musicPlaying: false
+    };
+
+    // --- 3. AUDIO ---
+    const audio = document.getElementById('bg-music');
+    const musicBtn = document.getElementById('music-control');
+
+    window.toggleMusic = function() {
+        if(audio.paused) {
+            audio.play(); musicBtn.innerText = "🔊"; window.state.musicPlaying = true;
+        } else {
+            audio.pause(); musicBtn.innerText = "🔇"; window.state.musicPlaying = false;
+        }
+    }
+
+    function tryPlayMusic() {
+        if(!window.state.musicPlaying) {
+            audio.play().then(() => {
+                musicBtn.innerText = "🔊"; window.state.musicPlaying = true;
+            }).catch(e => console.log("Auto-play blocked"));
+        }
+    }
+
+    // --- 4. GAME FLOW ---
+    window.handleYes = function() {
+        tryPlayMusic();
+        document.getElementById('ai-text').innerHTML = "Tuyệt vời!<br>Bước 1: Hãy nhập tên của bạn vào bên dưới.";
+        document.getElementById('choice-btns').style.display = 'none';
+        document.getElementById('name-entry-area').style.display = 'flex';
+    }
+
+    window.handleNo = function() {
+        tryPlayMusic();
+        const btnNo = document.getElementById('btn-no');
+        btnNo.innerText = "CÓ CHỨ";
+        btnNo.style.backgroundColor = "var(--lixi-gold)";
+        btnNo.style.color = "#d90429";
+        btnNo.onclick = window.handleYes;
+    }
+
+    window.submitName = function() {
+        const nameInput = document.getElementById('nameInput');
+        const name = nameInput.value.trim();
+        if(!name) { alert("Đừng ngại, nhập tên đi mà! 🥺"); return; }
+        
+        window.state.userName = name;
+        const nameElements = document.querySelectorAll('.player-name');
+        nameElements.forEach(element => {
+            element.innerText = state.userName;
+        });
+        document.getElementById('rules-modal').style.display = 'flex';
+    }
+
+    window.startGame = function() {
+        document.getElementById('rules-modal').style.display = 'none';
+        document.getElementById('chat-interface').style.display = 'none';
+        document.getElementById('game-interface').style.display = 'block';
+        initGrid();
+    }
+
+    function formatCurrency(amount) { return amount.toLocaleString('vi-VN') + 'đ'; }
+
+    function initGrid() {
+        const grid = document.getElementById('grid');
+        
+        // Fisher-Yates Shuffle
+        window.state.shuffledPrizes = [...PRIZE_POOL];
+        for (let i = window.state.shuffledPrizes.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [window.state.shuffledPrizes[i], window.state.shuffledPrizes[j]] = [window.state.shuffledPrizes[j], window.state.shuffledPrizes[i]];
+        }
+
+        grid.innerHTML = '';
+        window.state.shuffledPrizes.forEach(amount => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'envelope-wrapper';
+            
+            let imgSrc = '10k.jpg';
+            if(amount === 100000) imgSrc = '100k.jpg';
+            if(amount === 50000) imgSrc = '50k.jpg';
+            if(amount === 20000) imgSrc = '20k.jpg';
+
+            wrapper.innerHTML = `
+                <div class="envelope-inner">
+                    <div class="envelope-front">🧧</div>
+                    <div class="envelope-back">
+                        <img src="${imgSrc}" class="money-img">
+                    </div>
+                </div>
+            `;
+            
+            wrapper.onclick = function() {
+                if(window.state.picksLeft > 0 && !wrapper.classList.contains('opened')) {
+                    wrapper.classList.add('opened');
+                    window.state.picksLeft--;
+                    window.state.totalMoney += amount;
+                    document.getElementById('picks-left').innerText = window.state.picksLeft;
+                    document.getElementById('current-total').innerText = formatCurrency(window.state.totalMoney);
+                    
+                    if(window.state.picksLeft === 0) setTimeout(showResult, 2000);
+                }
+            };
+            grid.appendChild(wrapper);
+        });
+    }
+
+    async function showResult() {
+        const now = new Date();
+        const fullTime = `${now.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})} ${now.toLocaleDateString('vi-VN', {day: '2-digit', month: '2-digit', year: 'numeric'})}`;
+        
+        document.getElementById('ticket-name').innerText = window.state.userName;
+        document.getElementById('ticket-time').innerText = fullTime;
+        document.getElementById('ticket-total').innerText = formatCurrency(window.state.totalMoney);
+        document.getElementById('result-modal').style.display = 'flex';
+
+        // --- SAVE TO FIREBASE ---
+        try {
+            await addDoc(collection(db, "lixi_results"), {
+                name: window.state.userName,
+                money: window.state.totalMoney,
+                timestamp: now,
+                formattedTime: fullTime
+            });
+            console.log("Saved to database!");
+        } catch (e) {
+            console.error("Error saving document: ", e);
+            alert("Lỗi lưu kết quả. Kiểm tra kết nối mạng!");
+        }
+    }
+</script>
+
+</body>
+</html>
